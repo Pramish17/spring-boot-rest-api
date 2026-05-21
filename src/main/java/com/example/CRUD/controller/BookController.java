@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -29,9 +30,8 @@ public class BookController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Book> getBookById(@PathVariable Long id) {
-        Optional<Book> book = bookService.getBookById(id);
-        return book.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        Book book = bookService.getBookById(id);
+        return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
     @PostMapping
@@ -74,5 +74,20 @@ public class BookController {
         } catch (RuntimeException e) {
             return new ResponseEntity<>("Exception thrown: " + e.getMessage(), HttpStatus.OK);
         }
+    }
+
+    @GetMapping("/by-author/{author}")
+    public ResponseEntity<List<Book>> getBooksByAuthor(@PathVariable String author) {
+        return new ResponseEntity<>(bookService.findBooksByAuthor(author), HttpStatus.OK);
+    }
+
+    @GetMapping("/titles")
+    public ResponseEntity<List<String>> getAllTitles() {
+        return new ResponseEntity<>(bookService.getAllBookTitlesSorted(), HttpStatus.OK);
+    }
+
+    @GetMapping("/grouped-by-author")
+    public ResponseEntity<Map<String, Long>> getGroupedByAuthor() {
+        return new ResponseEntity<>(bookService.countBooksGroupedByAuthor(), HttpStatus.OK);
     }
 }

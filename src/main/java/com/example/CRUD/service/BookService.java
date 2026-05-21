@@ -1,5 +1,6 @@
 package com.example.CRUD.service;
 
+import com.example.CRUD.exception.ResourceNotFoundException;
 import com.example.CRUD.model.Book;
 import com.example.CRUD.repository.BookRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -22,8 +25,9 @@ public class BookService {
         return bookRepo.findAll();
     }
 
-    public Optional<Book> getBookById(Long id) {
-        return bookRepo.findById(id);
+    public Book getBookById(Long id) {
+        return bookRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
     }
 
     @Transactional
@@ -68,5 +72,19 @@ public class BookService {
     public Book addBookWithExternalCall(Book book) {
         // Now calls a method on a DIFFERENT bean (with proxy in between)
         return bookTransactionService.saveBookTransactional(book);
+    }
+
+    public List<Book> findBooksByAuthor (String author){
+        return bookRepo.findAll().stream().filter(book-> book.getAuthor().equalsIgnoreCase(author)).collect(Collectors.toList());
+    }
+    public List<String> getAllBookTitlesSorted() {
+        return bookRepo.findAll().stream()
+                .map(Book::getTitle)
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public Map<String, Long> countBooksGroupedByAuthor() {
+        return bookRepo.findAll().stream().collect(Collectors.groupingBy(Book::getAuthor, Collectors.counting()));
     }
 }

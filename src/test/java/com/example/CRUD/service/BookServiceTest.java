@@ -96,4 +96,24 @@ public class BookServiceTest {
         assertEquals("Test Author", result.getAuthor());
         verify(bookRepo).save(bookToSave);
     }
+
+    @Test
+    void testFindBooksByAuthor() {
+
+        // Arrange
+        Book book1 = new Book(1L, "Java Basics", "John");
+        Book book2 = new Book(2L, "Spring Boot", "JOHN");
+        Book book3 = new Book(3L, "Python", "David");
+
+        when(bookRepo.findAll())
+                .thenReturn(Arrays.asList(book1, book2, book3));
+
+        // Act
+        List<Book> result = bookService.findBooksByAuthor("john");
+
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals("Java Basics", result.get(0).getTitle());
+        assertEquals("Spring Boot", result.get(1).getTitle());
+    }
 }

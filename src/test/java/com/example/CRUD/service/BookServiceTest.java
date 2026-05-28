@@ -108,7 +108,6 @@ public class BookServiceTest {
         when(bookRepo.findAll())
                 .thenReturn(Arrays.asList(book1, book2, book3));
 
-        // Act
         List<Book> result = bookService.findBooksByAuthor("john");
 
         // Assert
